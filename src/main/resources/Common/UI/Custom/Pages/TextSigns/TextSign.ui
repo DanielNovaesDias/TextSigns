@@ -1,0 +1,28 @@
+$C = "../../Common.ui";
+
+$C.@PageOverlay {}
+
+$C.@Container {
+    Anchor: (Width: 500, Height: 120);
+
+    #Title {
+        Group {
+            $C.@Title {
+               @Text = %customUI.textSign.title;
+            }
+        }
+    }
+
+     #Content {
+            LayoutMode: Top;
+
+            $C.@TextField #SearchInput {
+                @Anchor = (Left: 4, Bottom: 4);
+
+                PlaceholderText: %customUI.textSign.placeholder;
+                AutoFocus: true;
+            }
+     }
+}
+
+$C.@BackButton {}
