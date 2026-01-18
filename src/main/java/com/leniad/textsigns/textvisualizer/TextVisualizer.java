@@ -21,8 +21,6 @@ public class TextVisualizer extends CustomUIHud {
             ui.append("Pages/TextSigns/TextVisualizer.ui");
             ui.set("#SignContent.Text", text);
         }
-
-
     }
 
 

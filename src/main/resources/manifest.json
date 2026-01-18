@@ -1,7 +1,7 @@
 {
   "Group": "leniad",
   "Name": "TextSigns",
-  "Version": "1.0.1",
+  "Version": "1.0.2",
   "Description": "A Hytale plugin that enables you to write to signs and see their texts within a popup.",
   "Authors": [
     {
@@ -14,7 +14,9 @@
   "Main": "com.leniad.textsigns.TextSigns",
   "ServerVersion": "*",
   "Dependencies": {},
-  "OptionalDependencies": {},
+  "OptionalDependencies": {
+    "Buuz135:MultipleHUD": "*"
+  },
   "DisabledByDefault": false,
   "IncludesAssetPack": true
 }
