@@ -8,10 +8,11 @@ import com.hypixel.hytale.server.core.entity.EntityUtils;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.TargetUtil;
-import com.leniad.textsigns.SignTextsRegistry;
 import com.buuz135.mhud.MultipleHUD;
+import com.leniad.textsigns.interaction.SignState;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -50,7 +51,11 @@ public class CheckForSignTick extends EntityTickingSystem<EntityStore> {
         TextVisualizer hud = this.huds.get(playerRef);
 
         if (entStore != null && playerRef != null) {
+
+
             Vector3i selectedBlock = getSelectedBlockPos(entStore);
+
+
 
             //if (java.util.Objects.equals(lastSeenBlock, selectedBlock)) {
             //    return;
@@ -68,22 +73,32 @@ public class CheckForSignTick extends EntityTickingSystem<EntityStore> {
                 return;
             }
 
-            String value = getSignMetaData(selectedBlock, store);
+            BlockState signData = entStore.getStore().getExternalData().getWorld().getState(selectedBlock.x, selectedBlock.y, selectedBlock.z, true);
 
-            if (value != null && !value.isEmpty()) {
-                if (hud == null) {
-                    TextVisualizer newHud = new TextVisualizer(playerRef);
-                    newHud.setShouldDisplay(true);
-                    newHud.setText(value);
+            if (signData instanceof SignState) {
+                String value = ((SignState) signData).getSignText();
 
-                    this.showHideUI(newHud, player, playerRef);
+                if (value != null && !value.isEmpty()) {
+                    if (hud == null) {
+                        TextVisualizer newHud = new TextVisualizer(playerRef);
+                        newHud.setShouldDisplay(true);
+                        newHud.setText(value);
 
-                    huds.put(playerRef, newHud);
+                        this.showHideUI(newHud, player, playerRef);
+
+                        huds.put(playerRef, newHud);
+                    } else {
+                        hud.setShouldDisplay(true);
+                        hud.setText(value);
+
+                        this.showHideUI(hud, player, playerRef);
+
+                    }
                 } else {
-                    hud.setShouldDisplay(true);
-                    hud.setText(value);
-
-                    this.showHideUI(hud, player, playerRef);
+                    if (hud != null) {
+                        hud.setShouldDisplay(false);
+                        this.showHideUI(hud, player, playerRef);
+                    }
 
                 }
             } else {
@@ -91,16 +106,9 @@ public class CheckForSignTick extends EntityTickingSystem<EntityStore> {
                     hud.setShouldDisplay(false);
                     this.showHideUI(hud, player, playerRef);
                 }
-
             }
         }
 
-    }
-
-    public String getSignMetaData(Vector3i blockPos, @Nonnull Store<EntityStore> store) {
-        SignTextsRegistry res = store.getResource(SignTextsRegistry.getResourceType());
-        String text = res.get(blockPos);
-        return text != null ? text : "";
     }
 
     private Vector3i getSelectedBlockPos(Ref<EntityStore> ref) {

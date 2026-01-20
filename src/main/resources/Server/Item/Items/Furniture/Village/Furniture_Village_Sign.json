@@ -45,13 +45,14 @@
             "Use": {
                 "Interactions": [
                     {
-                        "Type": "OpenCustomUI",
-                        "Page": {
-                            "Id": "TextSign_UI"
-                        }
+                        "Type": "SignInteraction"
                     }
                 ]
             }
+        },
+        "State": {
+            "Id": "SignState",
+            "SignText": ""
         },
         "BlockParticleSetId": "Wood",
         "BlockSoundSetId": "Wood",

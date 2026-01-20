@@ -50,13 +50,14 @@
             "Use": {
                 "Interactions": [
                     {
-                        "Type": "OpenCustomUI",
-                        "Page": {
-                            "Id": "TextSign_UI"
-                        }
+                        "Type": "SignInteraction"
                     }
                 ]
             }
+        },
+        "State": {
+            "Id": "SignState",
+            "SignText": ""
         },
         "HitboxType": "Sign_Wall",
         "Material": "Solid",

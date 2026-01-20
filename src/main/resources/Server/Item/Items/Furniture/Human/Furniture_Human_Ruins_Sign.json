@@ -34,13 +34,14 @@
             "Use": {
                 "Interactions": [
                     {
-                        "Type": "OpenCustomUI",
-                        "Page": {
-                            "Id": "TextSign_UI"
-                        }
+                        "Type": "SignInteraction"
                     }
                 ]
             }
+        },
+        "State": {
+            "Id": "SignState",
+            "SignText": ""
         },
         "HitboxType": "Sign_Top",
         "Material": "Solid",
