@@ -28,7 +28,10 @@ public class CheckForSignTick extends EntityTickingSystem<EntityStore> {
     @Nonnull
     private final Query<EntityStore> query;
 
+    private final int UPDATE_INTERVAL_TICK = 10;
+
     private Vector3i lastSeenBlock;
+    private final ConcurrentHashMap<PlayerRef, Integer> tickCounters = new ConcurrentHashMap<>();
 
     private final Map<PlayerRef, TextVisualizer> huds = new ConcurrentHashMap<>();
 
@@ -62,7 +65,12 @@ public class CheckForSignTick extends EntityTickingSystem<EntityStore> {
             }
             return;
         }
-        if (selectedBlock.equals(this.lastSeenBlock)) return;
+
+        int currentTick = this.tickCounters.compute(playerRef, (ref, count) -> count == null ? 1 : count + 1);
+
+        if (selectedBlock.equals(this.lastSeenBlock) && currentTick < UPDATE_INTERVAL_TICK){
+            return;
+        };
 
         this.lastSeenBlock = selectedBlock;
 
@@ -77,16 +85,21 @@ public class CheckForSignTick extends EntityTickingSystem<EntityStore> {
                         TextVisualizer newHud = new TextVisualizer(playerRef, value, true);
                         this.setupUI(newHud, playerRef, player);
                         huds.put(playerRef, newHud);
+                        tickCounters.put(playerRef, 0);
                     } else {
                         hud.setDisplay(value, true);
+                        tickCounters.put(playerRef, 0);
                     }
                 }
             } else {
                 if (hud != null) {
                     hud.setDisplay("", false);
+                    tickCounters.put(playerRef, 0);
                 }
             }
         });
+
+
     }
 
 
