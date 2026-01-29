@@ -3,6 +3,7 @@ package com.leniad.textsigns.interaction;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.StateData;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
@@ -11,11 +12,15 @@ import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerSta
 import com.hypixel.hytale.server.core.universe.world.worldmap.WorldMapManager;
 
 import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
 
+@SuppressWarnings("removal")
 public class SignState extends BlockState {
     public static final Codec<SignState> CODEC;
 
     protected String signText;
+    protected boolean isLocked;
 
     public boolean initialize(@Nonnull BlockType blockType) {
         if (!super.initialize(blockType)) {
@@ -25,6 +30,7 @@ public class SignState extends BlockState {
             StateData signState = blockType.getState();
             if (signState instanceof SignState.SignStateData) {
                 signText = ((SignStateData) signState).getSignText();
+                isLocked = ((SignStateData) signState).getIsLocked();
             }
 
             return true;
@@ -37,8 +43,17 @@ public class SignState extends BlockState {
         this.markNeedsSave();
     }
 
+    public void setIsLocked(boolean locked) {
+        this.isLocked = locked;
+        this.markNeedsSave();
+    }
+
     public String getSignText() {
         return signText != null ? signText : "";
+    }
+
+    public boolean getIsLocked() {
+        return isLocked;
     }
 
     public void markNeedsSave() {
@@ -50,15 +65,19 @@ public class SignState extends BlockState {
                 BuilderCodec.builder(
                                 SignState.class, SignState::new, BlockState.BASE_CODEC)
                         .addField(
-                                new KeyedCodec("TextSign", Codec.STRING),
-                                (state, o) -> state.signText = o.toString(),
+                                new KeyedCodec<>("TextSign", Codec.STRING),
+                                (state, o) -> state.signText = o,
                                 (state) -> state.signText)
-                .build();
+                        .addField(new KeyedCodec<>("IsLocked", Codec.BOOLEAN),
+                                (state, isLocked) -> state.isLocked = isLocked,
+                                (state) -> state.isLocked)
+                        .build();
     }
 
     public static class SignStateData extends StateData {
         public static final BuilderCodec<SignStateData> CODEC;
         private String signText = "";
+        private boolean isLocked = false;
 
         protected SignStateData() {
         }
@@ -67,19 +86,36 @@ public class SignState extends BlockState {
             return this.signText;
         }
 
+        public boolean getIsLocked() {
+            return this.isLocked;
+        }
+
         @Nonnull
         public String toString() {
-            String signText = this.signText;
-            return "SignStateData{signText=" + signText + "} " + super.toString();
+            return "SignStateData{signText=" + this.signText + ", isLocked=" + this.isLocked + "} " + super.toString();
         }
 
         static {
             CODEC = (BuilderCodec.builder(SignState.SignStateData.class,
-                    SignState.SignStateData::new,
-                    StateData.DEFAULT_CODEC).append(new KeyedCodec("SignText", Codec.STRING),
-                    (t, i) -> t.signText = i,
-                    (t) -> t.getSignText()).add())
-                    .build();
+                            SignState.SignStateData::new,
+                            StateData.DEFAULT_CODEC)
+                    .append(
+                            new KeyedCodec<>("SignText", new MapCodec<>(Codec.STRING, HashMap::new, false)),
+                            (state, o) -> {
+                                state.signText = o.getOrDefault("Text", "");
+                                state.isLocked = Boolean.parseBoolean(o.getOrDefault("IsLocked", "false"));
+                            },
+                            (state) -> {
+                             Map<String, String> jsonMap = new HashMap<>();
+
+                             jsonMap.put("IsLocked", String.valueOf(state.isLocked));
+                             jsonMap.put("Text", state.signText);
+
+                             return jsonMap;
+                            }
+                          )
+                    .add()
+            ).build();
         }
     }
 }

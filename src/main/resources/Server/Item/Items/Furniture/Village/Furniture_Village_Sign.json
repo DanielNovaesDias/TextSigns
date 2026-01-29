@@ -52,7 +52,10 @@
         },
         "State": {
             "Id": "SignState",
-            "SignText": ""
+            "SignText": {
+                "Text": "",
+                "IsLocked": "false"
+            }
         },
         "BlockParticleSetId": "Wood",
         "BlockSoundSetId": "Wood",

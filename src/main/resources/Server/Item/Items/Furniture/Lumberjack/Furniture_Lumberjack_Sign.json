@@ -56,7 +56,10 @@
         },
         "State": {
             "Id": "SignState",
-            "SignText": ""
+            "SignText": {
+                "Text": "",
+                "IsLocked": "false"
+            }
         },
         "HitboxType": "Sign_Tall",
         "Material": "Solid",

@@ -88,8 +88,8 @@ public class CheckForSignTick extends EntityTickingSystem<EntityStore> {
         world.execute(() -> {
             BlockState signData = world.getState(selectedBlock.x, selectedBlock.y, selectedBlock.z, true);
 
-            if (signData instanceof SignState) {
-                String value = ((SignState) signData).getSignText();
+            if (signData instanceof SignState signStateCast) {
+                String value = signStateCast.getSignText();
 
                 if (value != null && !value.isEmpty()) {
                     if (hud == null) {
