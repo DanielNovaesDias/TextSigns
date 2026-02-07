@@ -42,6 +42,9 @@ public class SignUI extends InteractiveCustomUIPage<SignUI.PageData> {
         uiCommandBuilder.append("Pages/TextSigns/TextSign.ui");
         SignState currentState = getSignMetaData(store);
 
+        if (currentState == null) {
+            return;
+        }
         WorldChunk chunk = currentState.getChunk();
         assert chunk != null;
         Ref<ChunkStore> blockChunkRef = chunk.getBlockComponentEntity(interactedBlock.x, interactedBlock.y, interactedBlock.z);
